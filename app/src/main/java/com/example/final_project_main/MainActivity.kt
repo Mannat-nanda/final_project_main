@@ -14,8 +14,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.final_project_main.ui.theme.Final_project_mainTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var eventViewModel: EventViewModel
+    private lateinit var eventAdapter: EventAdapter
+    private lateinit var recyclerView: RecyclerView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        eventAdapter = EventAdapter(listOf()) // Start with an empty list
+        recyclerView.adapter = eventAdapter
+
         enableEdgeToEdge()
         setContent {
             Final_project_mainTheme {
@@ -23,9 +34,16 @@ class MainActivity : ComponentActivity() {
                     Greeting(
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
-                    )
+                                eventViewModel = ViewModelProvider(this).get(EventViewModel::class.java)
+
+                                eventViewModel.allEvents.observe(this, Observer { events ->
+                            // Update the cached copy of the events in the adapter.
+                            events?.let {
+                                eventAdapter = EventAdapter(it)
+                                recyclerView.adapter = eventAdapter
+
                 }
-            }
+            })
         }
     }
 }
